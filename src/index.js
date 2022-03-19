@@ -46,9 +46,7 @@ function onTick(nodes, link, node) {
       .attr("x2", (d) => d.target.x)
       .attr("y2", (d) => d.target.y);
 
-    node.attr("transform", (d) => {
-      return "translate(" + d.x + "," + d.y + ")";
-    });
+    node.attr("transform", (d) => `translate(${d.x}, ${d.y})`);
   };
 }
 
@@ -85,15 +83,12 @@ function makeGraph(data, options) {
 
   const link = svg
     .append("g")
-    .attr("stroke", linkStroke)
-    .attr("stroke-opacity", linkStrokeOpacity)
-    .attr(
-      "stroke-width",
-      typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null
-    )
     .selectAll("line")
     .data(links)
-    .join("line");
+    .join("line")
+    .attr("stroke", linkStroke)
+    .attr("stroke-opacity", linkStrokeOpacity)
+    .attr("stroke-width", linkStrokeWidth);
 
   const node = svg
     .append("g")
@@ -126,9 +121,6 @@ function makeGraph(data, options) {
     .attr("y", labelYOffset + textHeight)
     .attr("font-size", "0.8em")
     .text(nodeId);
-
-  link.attr("stroke-width", linkStrokeWidth);
-  link.attr("stroke", linkStroke);
 
   simulation.on("tick", onTick(nodes, link, node));
 
