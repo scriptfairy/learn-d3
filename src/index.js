@@ -10,6 +10,13 @@ const linkStrokeWidth = (l) => Math.sqrt(l.value);
 const linkStrokeOpacity = (l) => 0.6;
 const cloneLink = (o) => Object.assign({}, o);
 
+const labelWidth = (d) => d.id.length * 9;
+const labelX = (d) => (-1 * labelWidth(d)) / 2;
+
+const textHeight = 15; // Approx
+const labelYOffset = 10;
+const labelHeight = 20;
+
 function onDrag(simulation) {
   function dragstarted(event) {
     if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -59,11 +66,7 @@ function makeGraph(data, options) {
 
   const forceNode = d3.forceManyBody().strength(-100);
 
-  const forceLink = d3
-    .forceLink(links)
-    .strength(0.1)
-    .distance((l) => 280)
-    .id(nodeId);
+  const forceLink = d3.forceLink(links).strength(0.1).distance(150).id(nodeId);
 
   const simulation = d3
     .forceSimulation(nodes)
@@ -98,13 +101,6 @@ function makeGraph(data, options) {
     .call(onDrag(simulation));
 
   node.append("circle").attr("fill", "#aaa").attr("r", 10);
-
-  const labelWidth = (d) => d.id.length * 9;
-  const labelX = (d) => (-1 * labelWidth(d)) / 2;
-
-  const textHeight = 15; // Approx
-  const labelYOffset = 10;
-  const labelHeight = 20;
 
   node
     .append("rect")
