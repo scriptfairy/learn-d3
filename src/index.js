@@ -2,22 +2,57 @@ import * as d3 from "d3";
 
 import miserables from "../data/miserables2.json";
 
-// Node functions
 const nodeId = (d) => d.id;
-const cloneNode = ({ id }) => ({ id });
+const cloneNode = (o) => Object.assign({}, o);
 
-// Link functions
 const linkStroke = (l) => "#999";
 const linkStrokeWidth = (l) => Math.sqrt(l.value);
 const linkStrokeOpacity = (l) => 0.6;
-const cloneLink = ({ source, target, value }) => ({ source, target, value });
+const cloneLink = (o) => Object.assign({}, o);
 
-// This a "constructor" function for creating instances of objects.
-// I.e. it's like declaring a "class".
-//
-// This is indicated by the **naming convention** only,
-// using a capital letter as the first letter in the name.
-function ForceGraph(data, options) {
+function onDrag(simulation) {
+  function dragstarted(event) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    event.subject.fx = event.subject.x;
+    event.subject.fy = event.subject.y;
+  }
+
+  function dragged(event) {
+    event.subject.fx = event.x;
+    event.subject.fy = event.y;
+  }
+
+  function dragended(event) {
+    if (!event.active) simulation.alphaTarget(0);
+    event.subject.fx = null;
+    event.subject.fy = null;
+  }
+
+  return d3
+    .drag()
+    .on("start", dragstarted)
+    .on("drag", dragged)
+    .on("end", dragended);
+}
+
+function onTick(nodes, link, node) {
+  return function () {
+    nodes[0].x = 0;
+    nodes[0].y = 0;
+
+    link
+      .attr("x1", (d) => d.source.x)
+      .attr("y1", (d) => d.source.y)
+      .attr("x2", (d) => d.target.x)
+      .attr("y2", (d) => d.target.y);
+
+    node.attr("transform", (d) => {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+  };
+}
+
+function makeGraph(data, options) {
   const { nodes: originalNodes, links: originalLinks } = data;
   const { width, height } = options;
 
@@ -36,8 +71,7 @@ function ForceGraph(data, options) {
     .forceSimulation(nodes)
     .force("link", forceLink)
     .force("charge", forceNode)
-    .force("center", d3.forceCenter())
-    .on("tick", ticked);
+    .force("center", d3.forceCenter());
 
   const svg = d3
     .create("svg")
@@ -66,7 +100,7 @@ function ForceGraph(data, options) {
     .selectAll("g")
     .data(nodes)
     .join("g")
-    .call(drag(simulation));
+    .call(onDrag(simulation));
 
   node.append("circle").attr("fill", "#aaa").attr("r", 10);
 
@@ -96,52 +130,14 @@ function ForceGraph(data, options) {
   link.attr("stroke-width", linkStrokeWidth);
   link.attr("stroke", linkStroke);
 
-  function ticked() {
-    nodes[0].x = 0;
-    nodes[0].y = 0;
-
-    link
-      .attr("x1", (d) => d.source.x)
-      .attr("y1", (d) => d.source.y)
-      .attr("x2", (d) => d.target.x)
-      .attr("y2", (d) => d.target.y);
-
-    node.attr("transform", (d) => {
-      return "translate(" + d.x + "," + d.y + ")";
-    });
-  }
-
-  function drag(simulation) {
-    function dragstarted(event) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      event.subject.fx = event.subject.x;
-      event.subject.fy = event.subject.y;
-    }
-
-    function dragged(event) {
-      event.subject.fx = event.x;
-      event.subject.fy = event.y;
-    }
-
-    function dragended(event) {
-      if (!event.active) simulation.alphaTarget(0);
-      event.subject.fx = null;
-      event.subject.fy = null;
-    }
-
-    return d3
-      .drag()
-      .on("start", dragstarted)
-      .on("drag", dragged)
-      .on("end", dragended);
-  }
+  simulation.on("tick", onTick(nodes, link, node));
 
   return svg.node();
 }
 
-const graph = ForceGraph(miserables, {
+const graph = makeGraph(miserables, {
   width: 800,
-  height: 600,
+  height: 500,
 });
 
 document.getElementById("app").appendChild(graph);
