@@ -79,10 +79,7 @@ function makeGraph(data, options) {
     .attr("width", width)
     .attr("height", height)
     .attr("viewBox", [-width / 2, -height / 2, width, height])
-    .attr(
-      "style",
-      "max-width: 100%; height: auto; height: intrinsic; border: 1px solid #888888;"
-    );
+    .attr("style", "border: 1px solid #888888;");
 
   const link = svg
     .append("g")
