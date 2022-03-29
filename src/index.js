@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-import miserables from "../data/miserables2.json";
+import miserables from "../data/miserables.json";
 
 const nodeId = (d) => d.id;
 const cloneNode = (o) => Object.assign({}, o);
