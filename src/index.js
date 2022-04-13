@@ -1,8 +1,9 @@
 import * as d3 from "d3";
 
-import miserables from "../data/miserables.json";
+import miserables from "../data/miserables2.json";
 
 const nodeId = (d) => d.id;
+const color = d3.scaleOrdinal(d3.schemeAccent);
 const cloneNode = (o) => Object.assign({}, o);
 
 const linkStroke = (l) => "#999";
@@ -66,7 +67,7 @@ function makeGraph(data, options) {
 
   const forceNode = d3.forceManyBody().strength(-100);
 
-  const forceLink = d3.forceLink(links).strength(0.1).distance(150).id(nodeId);
+  const forceLink = d3.forceLink(links).strength(0.1).distance(100).id(nodeId);
 
   const simulation = d3
     .forceSimulation(nodes)
@@ -97,7 +98,13 @@ function makeGraph(data, options) {
     .join("g")
     .call(onDrag(simulation));
 
-  node.append("circle").attr("fill", "#aaa").attr("r", 10);
+  node
+    .append("circle")
+    .attr("r", 10)
+    .attr("fill", function (d) {
+      return color(d.group);
+    });
+  //.attr("fill", "#aaa").attr("r", 10);
 
   node
     .append("rect")
@@ -121,8 +128,8 @@ function makeGraph(data, options) {
 }
 
 const graph = makeGraph(miserables, {
-  width: 800,
-  height: 500,
+  width: 1700,
+  height: 1700,
 });
 
 document.getElementById("app").appendChild(graph);
