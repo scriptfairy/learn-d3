@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-import miserables from "../data/miserables2.json";
+import miserables from "../data/miserables.json";
 
 const nodeId = (d) => d.id;
 const color = d3.scaleOrdinal(d3.schemeAccent);
@@ -128,8 +128,8 @@ function makeGraph(data, options) {
 }
 
 const graph = makeGraph(miserables, {
-  width: 1700,
-  height: 1700,
+  width: 1000,
+  height: 1000,
 });
 
 document.getElementById("app").appendChild(graph);
